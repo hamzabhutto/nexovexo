@@ -1,0 +1,92 @@
+// NexoVexo data model
+// Hosted PostgreSQL (Neon). DATABASE_URL is the pooled connection used at
+// runtime; DIRECT_URL is the direct (non-pooled) connection used for
+// migrations. On Neon, DATABASE_URL ends with "-pooler" in the host.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String // bcrypt hash
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  summary     String
+  description String
+  icon        String   @default("code") // icon key rendered on the frontend
+  features    String   @default("") // newline-separated bullet points
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  client      String   @default("")
+  category    String   @default("Web")
+  summary     String
+  description String
+  coverColor  String   @default("blue") // cyan | blue | violet - gradient accent
+  techStack   String   @default("") // comma-separated
+  liveUrl     String   @default("")
+  featured    Boolean  @default(false)
+  published   Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  role      String   @default("")
+  company   String   @default("")
+  quote     String
+  rating    Int      @default(5)
+  published Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model ContactInquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  company   String   @default("")
+  budget    String   @default("")
+  service   String   @default("")
+  message   String
+  status    String   @default("new") // new | read | archived
+  createdAt DateTime @default(now())
+}
+
+model Consultation {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  company   String   @default("")
+  topic     String   @default("")
+  date      String // preferred date (YYYY-MM-DD)
+  slot      String // preferred time slot
+  notes     String   @default("")
+  status    String   @default("new") // new | confirmed | done | cancelled
+  createdAt DateTime @default(now())
+}
