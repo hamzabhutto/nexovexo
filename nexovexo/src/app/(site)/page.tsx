@@ -7,8 +7,11 @@ import TechStack from "@/components/sections/TechStack";
 import Contact from "@/components/sections/Contact";
 import JsonLd from "@/components/JsonLd";
 
-// Content is DB-backed and may change via the admin panel, so render dynamically.
-export const dynamic = "force-dynamic";
+// Cached (ISR): the page is served from cache and regenerated at most once per
+// `revalidate` window, so visitors don't wait on a live DB query every load.
+// The admin triggers an on-demand refresh (via /api/revalidate) when content
+// changes, so edits still show up quickly.
+export const revalidate = 300; // seconds (5 min safety net)
 
 export default function HomePage() {
   return (

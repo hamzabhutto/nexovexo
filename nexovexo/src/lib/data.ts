@@ -1,42 +1,62 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
-// Public data accessors used by the marketing site. These always run on the
-// server and only return published records.
+// Public data accessors. Each is wrapped in the Next.js data cache and tagged
+// so the admin can revalidate on demand (via /api/revalidate). This keeps the
+// public pages fast (served from cache) while still reflecting edits quickly.
 
-export async function getServices() {
-  return prisma.service.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-  });
-}
+// Shared cache tag — revalidating "content" refreshes all public data.
+export const CONTENT_TAG = "content";
 
-export async function getProjects() {
-  return prisma.project.findMany({
-    where: { published: true },
-    orderBy: [{ order: "asc" }, { createdAt: "desc" }],
-  });
-}
+export const getServices = unstable_cache(
+  async () =>
+    prisma.service.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    }),
+  ["services"],
+  { tags: [CONTENT_TAG], revalidate: 300 }
+);
 
-export async function getFeaturedProjects() {
-  return prisma.project.findMany({
-    where: { published: true, featured: true },
-    orderBy: { order: "asc" },
-  });
-}
+export const getProjects = unstable_cache(
+  async () =>
+    prisma.project.findMany({
+      where: { published: true },
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+    }),
+  ["projects"],
+  { tags: [CONTENT_TAG], revalidate: 300 }
+);
 
-export async function getTestimonials() {
-  return prisma.testimonial.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-  });
-}
+export const getFeaturedProjects = unstable_cache(
+  async () =>
+    prisma.project.findMany({
+      where: { published: true, featured: true },
+      orderBy: { order: "asc" },
+    }),
+  ["featured-projects"],
+  { tags: [CONTENT_TAG], revalidate: 300 }
+);
 
-export async function getSiteStats() {
-  return prisma.siteStat.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-  });
-}
+export const getTestimonials = unstable_cache(
+  async () =>
+    prisma.testimonial.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    }),
+  ["testimonials"],
+  { tags: [CONTENT_TAG], revalidate: 300 }
+);
+
+export const getSiteStats = unstable_cache(
+  async () =>
+    prisma.siteStat.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+    }),
+  ["site-stats"],
+  { tags: [CONTENT_TAG], revalidate: 300 }
+);
 
 export function splitLines(value: string): string[] {
   return value

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { guardApi } from "@/lib/api-auth";
+import { revalidatePublicSite } from "@/lib/revalidate";
 
 const schema = z.object({
   title: z.string().trim().min(1).max(160),
@@ -26,7 +27,9 @@ export async function POST(request: Request) {
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
   try {
-    return NextResponse.json(await prisma.service.create({ data: parsed.data }), { status: 201 });
+    const created = await prisma.service.create({ data: parsed.data });
+    await revalidatePublicSite();
+    return NextResponse.json(created, { status: 201 });
   } catch {
     return NextResponse.json({ error: "A service with that slug already exists" }, { status: 409 });
   }
