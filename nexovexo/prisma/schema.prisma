@@ -1,7 +1,7 @@
 // NexoVexo data model
-// Hosted PostgreSQL (Neon). DATABASE_URL is the pooled connection used at
-// runtime; DIRECT_URL is the direct (non-pooled) connection used for
-// migrations. On Neon, DATABASE_URL ends with "-pooler" in the host.
+// Hosted PostgreSQL (Supabase). DATABASE_URL is the pooled (6543) connection
+// used at runtime; DIRECT_URL is the session (5432) connection used for
+// migrations. Shared by the public site and the admin app.
 
 generator client {
   provider = "prisma-client-js"
@@ -48,8 +48,12 @@ model Project {
   techStack   String   @default("") // comma-separated
   liveUrl     String   @default("")
   featured    Boolean  @default(false)
-  published   Boolean  @default(true)
+  published   Boolean  @default(true) // show on public site
   order       Int      @default(0)
+  // Delivery tracking (managed in admin)
+  status      String   @default("completed") // completed | in_progress | pending | on_hold
+  stage       String   @default("launched") // discovery | design | development | review | launched
+  progress    Int      @default(100) // 0-100 percent complete
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -89,4 +93,18 @@ model Consultation {
   notes     String   @default("")
   status    String   @default("new") // new | confirmed | done | cancelled
   createdAt DateTime @default(now())
+}
+
+// Editable stats shown on the public site (hero / footer numbers).
+// Keyed by a stable `key` so the frontend can look each one up.
+model SiteStat {
+  id        String   @id @default(cuid())
+  key       String   @unique // e.g. "projects_delivered", "uptime", "avg_load"
+  label     String // human label, e.g. "Projects delivered"
+  value     String // display value, e.g. "40+", "99.9%", "1.2s"
+  percent   Int      @default(100) // 0-100, for bars/rings
+  color     String   @default("cyan") // cyan | blue | violet | teal | pink | amber | green
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  updatedAt DateTime @updatedAt
 }

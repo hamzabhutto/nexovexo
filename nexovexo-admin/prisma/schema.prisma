@@ -1,0 +1,110 @@
+// NexoVexo data model
+// Hosted PostgreSQL (Supabase). DATABASE_URL is the pooled (6543) connection
+// used at runtime; DIRECT_URL is the session (5432) connection used for
+// migrations. Shared by the public site and the admin app.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String // bcrypt hash
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  summary     String
+  description String
+  icon        String   @default("code") // icon key rendered on the frontend
+  features    String   @default("") // newline-separated bullet points
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  client      String   @default("")
+  category    String   @default("Web")
+  summary     String
+  description String
+  coverColor  String   @default("blue") // cyan | blue | violet - gradient accent
+  techStack   String   @default("") // comma-separated
+  liveUrl     String   @default("")
+  featured    Boolean  @default(false)
+  published   Boolean  @default(true) // show on public site
+  order       Int      @default(0)
+  // Delivery tracking (managed in admin)
+  status      String   @default("completed") // completed | in_progress | pending | on_hold
+  stage       String   @default("launched") // discovery | design | development | review | launched
+  progress    Int      @default(100) // 0-100 percent complete
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  role      String   @default("")
+  company   String   @default("")
+  quote     String
+  rating    Int      @default(5)
+  published Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model ContactInquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  company   String   @default("")
+  budget    String   @default("")
+  service   String   @default("")
+  message   String
+  status    String   @default("new") // new | read | archived
+  createdAt DateTime @default(now())
+}
+
+model Consultation {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  company   String   @default("")
+  topic     String   @default("")
+  date      String // preferred date (YYYY-MM-DD)
+  slot      String // preferred time slot
+  notes     String   @default("")
+  status    String   @default("new") // new | confirmed | done | cancelled
+  createdAt DateTime @default(now())
+}
+
+// Editable stats shown on the public site (hero / footer numbers).
+// Keyed by a stable `key` so the frontend can look each one up.
+model SiteStat {
+  id        String   @id @default(cuid())
+  key       String   @unique // e.g. "projects_delivered", "uptime", "avg_load"
+  label     String // human label, e.g. "Projects delivered"
+  value     String // display value, e.g. "40+", "99.9%", "1.2s"
+  percent   Int      @default(100) // 0-100, for bars/rings
+  color     String   @default("cyan") // cyan | blue | violet | teal | pink | amber | green
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}

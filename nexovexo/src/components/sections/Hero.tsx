@@ -3,23 +3,22 @@ import BrandIntro from "@/components/BrandIntro";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden pt-36 pb-24 sm:pt-44 sm:pb-32">
-      {/* backdrops */}
-      <div className="aurora" aria-hidden />
-      <div className="grid-backdrop absolute inset-0" aria-hidden />
+    <section className="relative overflow-hidden pt-28 pb-20 sm:pt-44 sm:pb-32">
+      {/* backdrops — desktop only; heavy blur/mask layers can misrender on mobile */}
+      <div className="aurora hidden sm:block" aria-hidden />
+      <div className="grid-backdrop absolute inset-0 hidden sm:block" aria-hidden />
 
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <Reveal delay={0}>
-            <h1 className="text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
-              We build software that
-              <br className="hidden sm:block" />{" "}
+            <h1 className="text-[2rem] font-bold leading-[1.1] tracking-tight sm:text-7xl sm:leading-[1.05]">
+              We build software that{" "}
               <span className="brand-text-animated">moves you forward</span>
             </h1>
           </Reveal>
 
           <Reveal delay={100}>
-            <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-muted sm:text-xl">
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted sm:mt-7 sm:text-xl">
               NexoVexo is a software house delivering fast, custom websites,
               cloud platforms, and AI-driven products — engineered for
               performance and built to ship.
@@ -39,8 +38,8 @@ export default function Hero() {
           </Reveal>
 
           {/* Animated brand lockup: N + EXOVEXO flies in from the header */}
-          <div className="relative mt-20 flex justify-center">
-            <div className="absolute top-1/2 h-56 w-[32rem] max-w-full -translate-y-1/2 rounded-full bg-brand-blue/15 blur-3xl" aria-hidden />
+          <div className="relative mt-10 flex justify-center sm:mt-20">
+            <div className="absolute top-1/2 h-40 w-[32rem] max-w-full -translate-y-1/2 rounded-full bg-brand-blue/15 blur-3xl sm:h-56" aria-hidden />
             <div className="relative">
               <BrandIntro />
             </div>

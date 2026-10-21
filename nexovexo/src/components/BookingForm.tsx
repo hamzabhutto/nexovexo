@@ -1,4 +1,4 @@
-"use client";
+"use client";"use client";
 
 import { useMemo, useState } from "react";
 
@@ -107,8 +107,11 @@ export default function BookingForm() {
   return (
     <form onSubmit={handleSubmit} className="card p-6 sm:p-8">
       {/* Date picker */}
-      <label className="mb-3 block text-sm font-semibold">Pick a day</label>
-      <div className="flex gap-2.5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mb-3 flex items-center justify-between">
+        <label className="block text-sm font-semibold">Pick a day</label>
+        <span className="text-xs text-muted-dim">swipe for more →</span>
+      </div>
+      <div className="-mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {days.map((d) => {
           const selected = d.value === date;
           return (
@@ -116,15 +119,16 @@ export default function BookingForm() {
               type="button"
               key={d.value}
               onClick={() => setDate(d.value)}
-              className={`flex min-w-[64px] flex-col items-center rounded-2xl border px-3 py-3 transition-all ${
+              style={{ touchAction: "manipulation" }}
+              className={`flex min-w-[58px] shrink-0 snap-start flex-col items-center rounded-2xl border px-2.5 py-2.5 transition-all [&>span]:pointer-events-none ${
                 selected
                   ? "border-transparent brand-gradient text-white shadow-lg shadow-brand-blue/30"
                   : "border-border bg-surface-2/60 text-muted hover:border-brand-blue/40 hover:text-foreground"
               }`}
             >
-              <span className="text-[11px] uppercase tracking-wide opacity-80">{d.weekday}</span>
+              <span className="text-[10px] uppercase tracking-wide opacity-80">{d.weekday}</span>
               <span className="text-lg font-bold">{d.day}</span>
-              <span className="text-[11px] opacity-80">{d.month}</span>
+              <span className="text-[10px] opacity-80">{d.month}</span>
             </button>
           );
         })}
@@ -140,6 +144,7 @@ export default function BookingForm() {
               type="button"
               key={s}
               onClick={() => setSlot(s)}
+              style={{ touchAction: "manipulation" }}
               className={`rounded-xl border px-2 py-2.5 text-sm font-medium transition-all ${
                 selected
                   ? "border-transparent brand-gradient text-white"

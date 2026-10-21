@@ -31,6 +31,13 @@ export async function getTestimonials() {
   });
 }
 
+export async function getSiteStats() {
+  return prisma.siteStat.findMany({
+    where: { published: true },
+    orderBy: { order: "asc" },
+  });
+}
+
 export function splitLines(value: string): string[] {
   return value
     .split("\n")

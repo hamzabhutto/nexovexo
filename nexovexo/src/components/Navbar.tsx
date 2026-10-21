@@ -17,18 +17,31 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  const [hidden, setHidden] = useState(false); // hide header when scrolling down
   const barRef = useRef<HTMLDivElement | null>(null);
+  const lastY = useRef(0);
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 12);
+      const y = window.scrollY;
+      setScrolled(y > 12);
       const h = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(h > 0 ? Math.min(window.scrollY / h, 1) : 0);
+      setProgress(h > 0 ? Math.min(y / h, 1) : 0);
+
+      // Hide on scroll down (past a small threshold), reveal on scroll up.
+      // Never hide while the mobile menu is open.
+      if (!open) {
+        if (y > lastY.current && y > 80) setHidden(true);
+        else if (y < lastY.current) setHidden(false);
+      }
+      lastY.current = y;
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [open]);
+
+
 
   // Measure the bar so the SVG border rect matches its size exactly.
   useEffect(() => {
@@ -50,10 +63,11 @@ export default function Navbar() {
     size.w && size.h ? 2 * (size.w + size.h) - 8 * r + 2 * Math.PI * r : 0;
 
   return (
+    <>
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled ? "py-2" : "py-4"
-      }`}
+      } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
       <div
         ref={barRef}
@@ -96,8 +110,8 @@ export default function Navbar() {
 
         <Link href="/" aria-label="NexoVexo home" className="relative z-10 flex items-center transition-transform hover:scale-[1.02]">
           <LogoMark className="h-9 w-9" />
-          {/* EXOVEXO shown on load, flies away once the hero intro completes */}
-          <span className="nx-header-letters ml-1 font-display text-lg font-bold uppercase tracking-[0.14em] text-foreground">
+          {/* Wordmark only on desktop; mobile header shows just the N mark */}
+          <span className="nx-header-letters ml-1 hidden font-display text-lg font-bold uppercase tracking-[0.14em] text-foreground md:inline-block">
             exovexo
           </span>
         </Link>
@@ -126,8 +140,9 @@ export default function Navbar() {
 
         {/* Mobile toggle */}
         <button
+          type="button"
           onClick={() => setOpen((v) => !v)}
-          className="btn-ghost relative z-10 flex h-10 w-10 items-center justify-center rounded-xl md:hidden"
+          className="btn-ghost relative z-[70] flex h-11 w-11 items-center justify-center rounded-xl md:hidden"
           aria-label="Toggle menu"
           aria-expanded={open}
         >
@@ -140,32 +155,53 @@ export default function Navbar() {
           </svg>
         </button>
       </div>
-
-      {/* Mobile menu */}
-      <div
-        className={`mx-auto max-w-6xl overflow-hidden px-4 transition-[max-height,opacity] duration-400 md:hidden ${
-          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="mt-2 flex flex-col gap-1 rounded-2xl glass border border-border p-3">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className="rounded-xl px-4 py-3 text-sm font-medium text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
-            >
-              {l.label}
-            </a>
-          ))}
-          <a href="/book" onClick={() => setOpen(false)} className="btn-ghost mt-1 rounded-xl px-5 py-3 text-center text-sm font-semibold">
-            Book a free call
-          </a>
-          <a href="/#contact" onClick={() => setOpen(false)} className="btn-primary rounded-xl px-5 py-3 text-center text-sm font-semibold">
-            Start a project
-          </a>
-        </div>
-      </div>
     </header>
+
+    {/*
+      Mobile menu — rendered OUTSIDE the <header> on purpose. The header has a
+      CSS transform (hide-on-scroll), and a transformed ancestor breaks
+      position:fixed for its children. As a top-level sibling, this fixed
+      overlay positions against the viewport correctly.
+    */}
+    {open && (
+      <>
+        {/* tap-catch backdrop */}
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-[60] bg-background/60 backdrop-blur-sm md:hidden"
+        />
+        <div className="fixed inset-x-3 top-[76px] z-[65] md:hidden">
+          <div className="flex flex-col gap-1 rounded-2xl border border-border bg-background p-3 shadow-2xl">
+            {links.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className="rounded-xl px-4 py-3.5 text-base font-medium text-foreground transition-colors active:bg-surface-2"
+              >
+                {l.label}
+              </a>
+            ))}
+            <a
+              href="/book"
+              onClick={() => setOpen(false)}
+              className="btn-ghost mt-1 rounded-xl px-5 py-3.5 text-center text-sm font-semibold"
+            >
+              Book a free call
+            </a>
+            <a
+              href="/#contact"
+              onClick={() => setOpen(false)}
+              className="btn-primary rounded-xl px-5 py-3.5 text-center text-sm font-semibold"
+            >
+              Start a project
+            </a>
+          </div>
+        </div>
+      </>
+    )}
+    </>
   );
 }

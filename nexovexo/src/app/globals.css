@@ -282,14 +282,24 @@ h1, h2, h3, h4 {
 .animate-float { animation: float-slow 7s ease-in-out infinite; }
 
 /* Scroll reveal: starts hidden, .is-visible is added by an observer. */
+/*
+  Reveal defaults to VISIBLE so content is NEVER stuck hidden (no dependency on
+  JS just to be seen). The optional entrance animation is applied only to
+  elements the observer explicitly marks with `.reveal-anim`, and removed once
+  they become visible. If JS never runs, everything simply shows.
+*/
 .reveal {
+  opacity: 1;
+  transform: none;
+}
+.reveal.reveal-anim {
   opacity: 0;
   transform: translateY(28px);
   transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
               transform 0.8s cubic-bezier(0.16,1,0.3,1);
   will-change: opacity, transform;
 }
-.reveal.is-visible {
+.reveal.reveal-anim.is-visible {
   opacity: 1;
   transform: translateY(0);
 }

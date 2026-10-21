@@ -17,14 +17,15 @@ const points = [
 
 export default function BookPage() {
   return (
-    <section className="relative overflow-hidden pt-36 pb-28 sm:pt-40">
-      <div className="aurora" aria-hidden />
-      <div className="grid-backdrop absolute inset-0" aria-hidden />
+    <section className="relative overflow-hidden pt-32 pb-24 sm:pt-40 sm:pb-28">
+      {/* backdrops — desktop only; heavy blur/animated layers overflow on mobile */}
+      <div className="aurora hidden sm:block" aria-hidden />
+      <div className="grid-backdrop absolute inset-0 hidden sm:block" aria-hidden />
 
-      <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
+      <div className="relative mx-auto w-full max-w-6xl px-5 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
           {/* Left: pitch */}
-          <div className="lg:pt-6">
+          <div className="min-w-0 lg:pt-6">
             <Reveal>
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-2/60 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand-cyan">
                 Free consultation
@@ -60,7 +61,7 @@ export default function BookPage() {
           </div>
 
           {/* Right: booking form */}
-          <Reveal delay={120}>
+          <Reveal delay={120} className="min-w-0">
             <BookingForm />
           </Reveal>
         </div>

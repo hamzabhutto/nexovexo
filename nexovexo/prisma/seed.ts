@@ -258,6 +258,9 @@ async function main() {
       techStack: "Next.js, NestJS, PostgreSQL, Redis",
       featured: false,
       order: 5,
+      status: "in_progress",
+      stage: "development",
+      progress: 65,
     },
     {
       title: "CloudGuard Infra",
@@ -272,6 +275,9 @@ async function main() {
       techStack: "Kubernetes, Terraform, GitHub Actions, AWS",
       featured: false,
       order: 6,
+      status: "pending",
+      stage: "discovery",
+      progress: 10,
     },
   ];
 
@@ -326,6 +332,23 @@ async function main() {
     }
   }
   console.log(`Seeded ${testimonials.length} testimonials`);
+
+  // Site stats (editable from admin; shown in the footer bento + elsewhere).
+  const stats = [
+    { key: "projects_delivered", label: "Projects delivered", value: "40+", percent: 90, color: "cyan", order: 1 },
+    { key: "uptime", label: "Uptime", value: "99.9%", percent: 99, color: "teal", order: 2 },
+    { key: "avg_load", label: "Avg. load time", value: "1.2s", percent: 85, color: "blue", order: 3 },
+    { key: "satisfaction", label: "Satisfaction", value: "96%", percent: 96, color: "violet", order: 4 },
+    { key: "support", label: "Support", value: "24/7", percent: 100, color: "green", order: 5 },
+  ];
+  for (const s of stats) {
+    await prisma.siteStat.upsert({
+      where: { key: s.key },
+      update: s,
+      create: s,
+    });
+  }
+  console.log(`Seeded ${stats.length} site stats`);
 }
 
 main()
